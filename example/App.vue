@@ -1,7 +1,9 @@
 <template>
     <div>
-        <input type="text" name="test[]" ref="placeholder" v-cloneya>
-        <vue-cloneya></vue-cloneya>
+
+        <vue-cloneya>
+            <input type="text" name="test[]" ref="placeholder" slot="content">
+        </vue-cloneya>
     </div>
 </template>
 
