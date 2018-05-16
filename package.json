@@ -1,0 +1,34 @@
+{
+  "name": "vue-cloneya",
+  "version": "1.0.0",
+  "description": "A vue plugin to clone DOM elements",
+  "main": "dist/vue-cloneya.js",
+  "repository": "https://github.com/ridaamirini/vue-cloneya.git",
+  "author": "ridaamirini <ridaamirini@rs-apps.de>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "parcel serve -p 8888 --public-url / ./example/index.html",
+    "build": "parcel build ./src/index.js -t node -o vue-cloneya.js --no-source-maps"
+  },
+  "unpkg": "dist/vue-cloneya.js",
+  "cdn": "dist/vue-cloneya.js",
+  "jsdelivr": "dist/vue-cloneya.js",
+  "keywords": [
+    "clonya",
+    "vue",
+    "clone-inputs",
+    "forms",
+    "clone"
+  ],
+  "dependencies": {
+    "vue": "^2.5.16"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-vue": "^2.0.2",
+    "parcel-bundler": "^1.8.1",
+    "parcel-plugin-vue": "^1.5.0",
+    "vue-template-compiler": "^2.5.16"
+  }
+}

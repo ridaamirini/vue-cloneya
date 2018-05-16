@@ -1,0 +1,5 @@
+.idea/
+.cache/
+node_modules/
+dist/
+!dist/vue-cloneya.js
