@@ -1,22 +1,78 @@
+import find from 'lodash/find';
+import cloneDeep from 'lodash/clone';
+
 export const createCloneYa = (opts = {}) => {
     const name = opts.name || 'VueCloneya';
 
     return {
         name,
-        props: {},
+        props: {
+            minimum: {
+                default: 1
+            },
+            maximum: {
+                default: 999
+            },
+            // Coming soon
+            /*valueClone: {
+                default: false
+            },*/
+            /*dataClone: {
+                default: false
+            },*/
+            /*deepClone: {
+                default: false
+            },*/
+        },
         data() {
             return {
-                test: 'Hello World JSX!',
-                renderData: [{}],
+                renderData: []
             }
         },
-        mounted() {},
+        mounted() {
+            for (let i = 0; i < this.minimum; i++) this.renderData.push({});
+        },
         beforeDestroy() {},
         render: function (h) {
             let _this = this;
             let vNodes = _this.$slots.default;
 
-            console.log(vNodes);
+            if (!vNodes || vNodes.length > 1) {
+                console.error('VueCloneya default slot should contain exactly one root element.');
+                return;
+            }
+
+            let elIndex = null;
+            // Add Event listener to buttons
+            const deepMap = function (el) {
+                if (el.tag === undefined) return;
+
+                if (el.data && el.data.hasOwnProperty('directives')) {
+                    let addBtnListener = find(el.data.directives, {'name': 'cloneya-add-btn'});
+                    let removeBtnListener = find(el.data.directives, {'name': 'cloneya-remove-btn'});
+
+                    if (addBtnListener) {
+                        el.data['on'] = {
+                            click: _this.add
+                        };
+
+                        return;
+                    }
+
+                    if (removeBtnListener) {
+                        el.data['attrs']['index'] = elIndex;
+
+                        el.data['on'] = {
+                            click: _this.del
+                        };
+                        return;
+                    }
+                }
+
+                if (el.hasOwnProperty('children') && el.children) {
+                    return el.children.map(deepMap);
+                }
+            };
 
             return h('div', {
                     class : {
@@ -24,34 +80,44 @@ export const createCloneYa = (opts = {}) => {
                     }
                 },
                 this.renderData.map(function (el, index, ctx){
-                    console.log(index);
+                    elIndex = index;
 
-                        return h('div', {
+                    let vNodeCloned = cloneDeep(vNodes)[0];
+                    vNodeCloned.children.map(deepMap);
+
+                    return h('div', {
                             key: index,
                             class: {
                                 'toClone': true
-                            },
-                            on: {
-                                click: _this.add
                             }
                         },
                         [
-                            vNodes,
-                            //button [-] :
-                            //ctx.length > 1      ? h('input',  {attrs:{type:'button', value:'-', index: index}, on:{click:_this.del}} ) : null,
-                            //button [+] :
-                            //index==ctx.length-1 ? h('input',  {attrs:{type:'button', value:'+'}, on:{click:_this.add}} ): null
+                            vNodeCloned
                         ]
-                    )
+                    );
                 })
             )
         },
         methods: {
             add(){
+                if (this.renderDatalength() === this.maximum) return;
+
                 this.renderData.push({});
             },
-            del(el){
-                this.renderData.splice( el.srcElement.attributes.index.value , 1);
+            del(event) {
+                if (this.renderDatalength() === this.minimum) return;
+
+                let el = event.currentTarget;
+                let index = parseInt(el.getAttribute('index'));
+
+                console.log(index);
+
+                this.renderData.splice(index, 1);
+                //delete this.renderData[index];
+                //this.$forceUpdate();
+            },
+            renderDatalength() {
+                return this.renderData.filter(el => el !== undefined).length;
             }
         }
     }
