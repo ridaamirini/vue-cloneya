@@ -36,7 +36,5 @@
     "vue-hot-reload-api": "^2.3.0",
     "vue-template-compiler": "^2.5.16"
   },
-  "dependencies": {
-    "lodash": "^4.17.10"
-  }
+  "dependencies": {}
 }

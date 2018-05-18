@@ -1,5 +1,3 @@
-import find from 'lodash/find';
-
 export const createCloneYa = (opts = {}) => {
     const name = opts.name || 'VueCloneya';
 
@@ -15,6 +13,16 @@ export const createCloneYa = (opts = {}) => {
         return rtn;
     };
 
+    const hasDirective = function (haystack, key, value) {
+        for (let i = 0; i < haystack.length; i++) {
+            if (haystack[i][key] === value) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
     return {
         name,
         props: {
@@ -24,16 +32,10 @@ export const createCloneYa = (opts = {}) => {
             maximum: {
                 default: 999
             },
-            // Coming soon
-            /*valueClone: {
-                default: false
-            },*/
-            /*dataClone: {
-                default: false
-            },*/
-            /*deepClone: {
-                default: false
-            },*/
+            value: {
+                default: null,
+                type: Array
+            }
         },
         data() {
             return {
@@ -41,9 +43,12 @@ export const createCloneYa = (opts = {}) => {
             }
         },
         mounted() {
-            for (let i = 0; i < this.minimum; i++) this.renderData.push({index: i, _hash: uniqId()});
+            if (this.value) {
+                this.fillWithValues();
+            }
+
+            this.fillToMin();
         },
-        beforeDestroy() {},
         render: function (h) {
             let _this = this;
             let vNodes = _this.$slots.default;
@@ -53,51 +58,15 @@ export const createCloneYa = (opts = {}) => {
                 return;
             }
 
-            /*let elIndex = null;
-            // Add Event listener to buttons
-            const deepMap = function (el) {
-                if (el.tag === undefined) return;
-
-                if (el.data && el.data.hasOwnProperty('directives')) {
-                    let addBtnListener = find(el.data.directives, {'name': 'cloneya-add-btn'});
-                    let removeBtnListener = find(el.data.directives, {'name': 'cloneya-remove-btn'});
-
-                    if (addBtnListener) {
-                        el.data['on'] = {
-                            click: _this.add
-                        };
-
-                        return;
-                    }
-
-                    if (removeBtnListener) {
-                        el.data['attrs']['index'] = elIndex;
-
-                        el.data['on'] = {
-                            click: _this.del
-                        };
-                        return;
-                    }
-                }
-
-                if (el.hasOwnProperty('children') && el.children) {
-                    return el.children.map(deepMap);
-                }
-            };
-            */
-
-            function deepCloneInject(vnodes, index, createElement) {
-                // console.log(index);
-
-                function cloneVNode (vnode) {
-                    // Inject events and values
+            const deepCloneInject = function (vnodes, payload, createElement) {
+                function cloneVNode(vnode) {
                     let vdata = {...vnode.data};
-                    console.log(vdata);
 
+                    // Inject events and values
                     if (vnode.data && vnode.data.hasOwnProperty('directives')) {
-                        let addBtnListener = find(vnode.data.directives, {'name': 'cloneya-add-btn'});
-                        let removeBtnListener = find(vnode.data.directives, {'name': 'cloneya-remove-btn'});
-                        let input = find(vnode.data.directives, {'name': 'cloneya-input'});
+                        let addBtnListener = hasDirective(vnode.data.directives, 'name', 'cloneya-add-btn');
+                        let removeBtnListener = hasDirective(vnode.data.directives, 'name', 'cloneya-remove-btn');
+                        let input = hasDirective(vnode.data.directives, 'name', 'cloneya-input');
 
                         if (addBtnListener) {
                             vdata['on'] = {
@@ -106,21 +75,23 @@ export const createCloneYa = (opts = {}) => {
                         }
 
                         if (removeBtnListener) {
-                            //console.log(vnode.data['attrs']);
-
-                            vdata['attrs']['index'] = index;
-
+                            vdata['attrs'] = {...vdata.attrs, index: payload.index};
                             vdata['on'] = {
                                 click: _this.del
                             };
                         }
 
-                        if (input) {
-                            vdata['attrs']['value'] = index;
+                        if (input && payload.el.hasOwnProperty('value')) {
+                            vdata['attrs'] = {...vdata.attrs, value: payload.el.value};
+                        } else if (input && vdata['attrs'].hasOwnProperty('value')) {
+                            // Clear old value from clone
+                            let clone = {...vdata.attrs};
+                            delete clone.value;
+                            vdata['attrs'] = {...clone};
                         }
                     }
 
-                    vnode.data = vdata; // vdata;
+                    vnode.data = vdata;
 
                     const clonedChildren = vnode.children && vnode.children.map(vnode => cloneVNode(vnode));
                     const cloned = createElement(vnode.tag, vnode.data, clonedChildren);
@@ -138,27 +109,15 @@ export const createCloneYa = (opts = {}) => {
                 }
 
                 return vnodes.map(vnode => cloneVNode(vnode));
-            }
+            };
 
             return h('div', {
                     class : {
                         'clone-wrapper': true
                     }
                 },
-                this.renderData.map(function (el, index, ctx){
-                    //elIndex = index;
-
-                    //let vNodeCloned = vNodes[0]; //deepClone(vNodes, h)[0];
-
-                    //let vNodesC = deepClone(vNodes, h);
-                    //console.log(vNodesC);
-                    //console.log(vNodeCloned);
-
-                    //vNodeCloned.children.map(deepMap);
-
-                    let nodes = deepCloneInject(vNodes, index, h);
-
-                   // console.log(el._hash);
+                this.renderData.map(function (el, index){
+                    let nodes = deepCloneInject(vNodes, {el, index}, h);
 
                     return h('div', {
                             key: el._hash,
@@ -175,21 +134,36 @@ export const createCloneYa = (opts = {}) => {
         },
         methods: {
             add(){
-                if (this.renderDatalength() === this.maximum) return;
+                if (this.renderData.length === this.maximum) return;
 
-                this.renderData.push({index: this.renderData.length, _hash: uniqId()});
+                this.renderData.push({_hash: uniqId()});
             },
             del(event) {
-                if (this.renderDatalength() === this.minimum) return;
+                let index = event.currentTarget.attributes.index.value;
 
-                let el = event.currentTarget;
+                if (this.renderData.length === this.minimum) {
+                    return this.$set(this.renderData, index, {_hash: uniqId()});
+                }
 
-                console.log(el.attributes.index.value);
-
-                this.renderData.splice(el.attributes.index.value, 1);
+                this.renderData.splice(index, 1);
             },
-            renderDatalength() {
-                return this.renderData.filter(el => el !== undefined).length;
+            fillToMin() {
+                let len = (this.minimum - this.renderData.length);
+
+                for (let i = 0; i < len; i++) {
+                    this.renderData.push({_hash: uniqId()});
+                }
+            },
+            fillWithValues() {
+                this.value.map(item => {
+                    return this.renderData.push({_hash: uniqId(), value: item});
+                });
+            }
+        },
+        watch: {
+            value: function() {
+                this.renderData = [];
+                this.fillWithValues();
             }
         }
     }
