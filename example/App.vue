@@ -32,7 +32,8 @@
                 exampleData: [
                     'Vue',
                     'Cloneya',
-                    'VueCloneya Example'
+                    'VueCloneya Example',
+                    'More than min'
                 ]
             }
         },

@@ -164,6 +164,7 @@ export const createCloneYa = (opts = {}) => {
             value: function() {
                 this.renderData = [];
                 this.fillWithValues();
+                this.fillToMin();
             }
         }
     }
@@ -172,7 +173,6 @@ export const createCloneYa = (opts = {}) => {
 export const install = (Vue, opts) => {
     const Component = createCloneYa(opts);
     Vue.component(Component.name, Component);
-
 
     Vue.directive('cloneyaInput', function (el) {
         el.classList.add('vcloneya');
