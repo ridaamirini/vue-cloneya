@@ -3,14 +3,14 @@ export const createCloneYa = (opts = {}) => {
 
     const uniqId = function() {
         let alp = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        let length = 8;
+        let length = 4;
         let rtn = '';
 
         for (let i = 0; i < length; i++) {
             rtn += alp.charAt(Math.floor(Math.random() * alp.length));
         }
 
-        return rtn;
+        return btoa(rtn + (new Date().getTime()));
     };
 
     const hasDirective = function (haystack, key, value) {
@@ -148,7 +148,7 @@ export const createCloneYa = (opts = {}) => {
                 this.renderData.splice(index, 1);
             },
             fillToMin() {
-                let len = (this.minimum - this.renderData.length);
+                let len = this.minimum - this.renderData.length;
 
                 for (let i = 0; i < len; i++) {
                     this.renderData.push({_hash: uniqId()});
