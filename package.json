@@ -1,6 +1,6 @@
 {
   "name": "vue-cloneya",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A vue plugin to clone DOM elements",
   "main": "dist/vue-cloneya.js",
   "repository": "https://github.com/ridaamirini/vue-cloneya.git",

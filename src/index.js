@@ -64,8 +64,8 @@ export const createCloneYa = (opts = {}) => {
 
                     // Inject events and values
                     if (vnode.data && vnode.data.hasOwnProperty('directives')) {
-                        let addBtnListener = hasDirective(vnode.data.directives, 'name', 'cloneya-add-btn');
-                        let removeBtnListener = hasDirective(vnode.data.directives, 'name', 'cloneya-remove-btn');
+                        let addBtnListener = hasDirective(vnode.data.directives, 'name', 'cloneya-add');
+                        let removeBtnListener = hasDirective(vnode.data.directives, 'name', 'cloneya-remove');
                         let input = hasDirective(vnode.data.directives, 'name', 'cloneya-input');
 
                         if (addBtnListener) {
@@ -165,6 +165,10 @@ export const createCloneYa = (opts = {}) => {
                 this.renderData = [];
                 this.fillWithValues();
                 this.fillToMin();
+            },
+            renderData: function(data) {
+                if (data.length === this.minimum) this.$emit('minimum:cloneya');
+                if (data.length === this.maximum) this.$emit('maximum:cloneya');
             }
         }
     }
@@ -178,12 +182,12 @@ export const install = (Vue, opts) => {
         el.classList.add('vcloneya');
     });
 
-    Vue.directive('cloneyaAddBtn', function (el) {
-        el.classList.add('vcloneya-add-btn');
+    Vue.directive('cloneyaAdd', function (el) {
+        el.classList.add('vcloneya-add');
     });
 
-    Vue.directive('cloneyaRemoveBtn', function (el) {
-        el.classList.add('vcloneya-remove-btn');
+    Vue.directive('cloneyaRemove', function (el) {
+        el.classList.add('vcloneya-remove');
     });
 };
 
