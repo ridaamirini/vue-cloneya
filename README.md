@@ -5,6 +5,12 @@
 
 > A vue component to clone DOM elements
 
+<p align="center">
+  <img src="https://media.giphy.com/media/vwEHGHTjE9hO0PIaVH/giphy.gif">
+</p>
+
+[Live demo here]('')
+
 ## Install
 
 ```bash
