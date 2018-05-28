@@ -8,7 +8,7 @@
         <div class="row" style="padding: 30px;">
             <div class="col-md-6 col-md-offset-4">
                 <div class="col-md-8">
-                    <vue-cloneya :minimum="1"  :value="exampleData" v-on:minimum:cloneya="alert('min')" v-on:maximum:cloneya="alert('max')">
+                    <vue-cloneya :minimum="1"  v-model="exampleData" v-on:minimum:cloneya="alert('min')" v-on:maximum:cloneya="alert('max')">
                         <div class="input-group" style="margin-top: 10px;">
                             <input type="text" name="example[]" class="form-control" placeholder="Example" v-cloneya-input>
                             <span class="input-group-btn">
@@ -39,13 +39,13 @@
         },
         mounted() {
             setTimeout(() => {
-                this.exampleData.reverse();
-                alert('Example data reversed');
+                // this.exampleData.reverse();
+                // alert('Example data reversed');
             }, 5000);
         },
         methods: {
             alert(msg) {
-                alert(msg);
+               // alert(msg);
             }
         }
     }

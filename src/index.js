@@ -81,6 +81,17 @@ export const createCloneYa = (opts = {}) => {
                             };
                         }
 
+                        // On input value
+                        if (input) {
+                            vdata['on'] = {
+                                ...vdata['on'],
+                                input: function (event) {
+                                    _this.updateData(payload.index, event.target.value);
+                                }
+                            }
+                        }
+
+                        // Set Value
                         if (input && payload.el.hasOwnProperty('value')) {
                             vdata['attrs'] = {...vdata.attrs, value: payload.el.value};
                         } else if (input && vdata['attrs'].hasOwnProperty('value')) {
@@ -137,15 +148,30 @@ export const createCloneYa = (opts = {}) => {
                 if (this.renderData.length === this.maximum) return;
 
                 this.renderData.push({_hash: uniqId()});
+                this.emitData();
             },
             del(event) {
                 let index = event.currentTarget.attributes.index.value;
 
                 if (this.renderData.length === this.minimum) {
-                    return this.$set(this.renderData, index, {_hash: uniqId()});
+                    this.$set(this.renderData, index, {_hash: uniqId()});
+                    return this.emitData();
                 }
 
                 this.renderData.splice(index, 1);
+                this.emitData();
+
+            },
+            updateData(index, value) {
+                this.$set(this.renderData[index], 'value', value);
+                this.emitData();
+            },
+            emitData() {
+                this.emitting = true;
+                this.$emit('input', this.getFilteredValues());
+                this.$nextTick(() => {
+                    this.emitting = false;
+                });
             },
             fillToMin() {
                 let len = this.minimum - this.renderData.length;
@@ -158,10 +184,19 @@ export const createCloneYa = (opts = {}) => {
                 this.value.map(item => {
                     return this.renderData.push({_hash: uniqId(), value: item});
                 });
+            },
+            getFilteredValues() {
+                return this.renderData.map((data) => {
+                    if (!data.hasOwnProperty('value')) return "";
+
+                    return data.value;
+                });
             }
         },
         watch: {
             value: function() {
+                if (this.emitting) return;
+
                 this.renderData = [];
                 this.fillWithValues();
                 this.fillToMin();
