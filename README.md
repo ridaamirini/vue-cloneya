@@ -72,7 +72,7 @@ The maximum number of clones allowed.
 - __Type__: `array`
 - __Default__: `null`
 
-The values for the v-cloneya-input. 
+The values for the v-cloneya-input. For Two-way Data Binding use `v-model`
 
 ### Events
 
