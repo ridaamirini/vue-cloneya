@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 const directives = {
     cloneyaInput: function (el) {
         el.classList.add('vcloneya');
