@@ -59,7 +59,13 @@
                         Street: 'Main Street',
                         Notes: 'Keep multiple active'
                     },
-                    {}
+                    {},
+                    {
+                        Name: 'John2',
+                        Name2: 'Doe2',
+                        Street: 'Main Street2',
+                        Notes: 'Keep multiple active2'
+                    }
                 ]
             }
         },
