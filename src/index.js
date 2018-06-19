@@ -68,7 +68,7 @@ export const createCloneYa = (opts = {}) => {
                                     _this.updateData(payload.index, event.target.value, vnode.data.directives[input].value);
                                 };
 
-                                if (payload.el.hasOwnProperty('value') && (_this.multiple && Object.keys(payload.el.value).length !== 0)) {
+                                if (payload.el.hasOwnProperty('value') || (_this.multiple && Object.keys(payload.el.value).length !== 0)) {
 
                                     console.log(element);
 
