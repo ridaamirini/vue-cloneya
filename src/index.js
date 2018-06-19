@@ -1,31 +1,15 @@
+import {uniqId, hasDirective} from './utils';
+import installDirectives from './directives';
+
 export const createCloneYa = (opts = {}) => {
     const name = opts.name || 'VueCloneya';
-
-    const uniqId = function() {
-        let alp = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        let length = 4;
-        let rtn = '';
-
-        for (let i = 0; i < length; i++) {
-            rtn += alp.charAt(Math.floor(Math.random() * alp.length));
-        }
-
-        return btoa(rtn + (new Date().getTime()));
-    };
-
-    const hasDirective = function (haystack, key, value) {
-        for (let i = 0; i < haystack.length; i++) {
-            if (haystack[i][key] === value) {
-                return true;
-            }
-        }
-
-        return false;
-    };
 
     return {
         name,
         props: {
+            multiple: {
+                default: false
+            },
             minimum: {
                 default: 1
             },
@@ -60,49 +44,45 @@ export const createCloneYa = (opts = {}) => {
 
             const deepCloneInject = function (vnodes, payload, createElement) {
                 function cloneVNode(vnode) {
-                    let vdata = {...vnode.data};
-
                     // Inject events and values
                     if (vnode.data && vnode.data.hasOwnProperty('directives')) {
-                        let addBtnListener = hasDirective(vnode.data.directives, 'name', 'cloneya-add');
-                        let removeBtnListener = hasDirective(vnode.data.directives, 'name', 'cloneya-remove');
-                        let input = hasDirective(vnode.data.directives, 'name', 'cloneya-input');
-
-                        if (addBtnListener) {
-                            vdata['on'] = {
-                                click: _this.add
+                            let addBtnListener = hasDirective(vnode.data.directives, 'name', 'cloneya-add') !== -1;
+                            let removeBtnListener = hasDirective(vnode.data.directives, 'name', 'cloneya-remove') !== -1;
+                            let input = hasDirective(vnode.data.directives, 'name', 'cloneya-input');
+                            let element = {
+                                on: {...vnode.data['on']},
+                                attrs: {...vnode.data['attrs']},
+                                domProps: {}
                             };
-                        }
 
-                        if (removeBtnListener) {
-                            vdata['attrs'] = {...vdata.attrs, index: payload.index};
-                            vdata['on'] = {
-                                click: _this.del
-                            };
-                        }
+                            if (addBtnListener) {
+                                element.on['click'] = _this.add
+                            } else if (removeBtnListener) {
+                                element.attrs['index'] = payload.index;
+                                element.on['click'] = _this.del;
+                            }
 
-                        // On input value
-                        if (input) {
-                            vdata['on'] = {
-                                ...vdata['on'],
-                                input: function (event) {
-                                    _this.updateData(payload.index, event.target.value);
+                            // On input value
+                            if (input !== -1) {
+                                element.on['input'] = function (event) {
+                                    _this.updateData(payload.index, event.target.value, vnode.data.directives[input].value);
+                                };
+
+                                if (payload.el.hasOwnProperty('value') && (_this.multiple && Object.keys(payload.el.value).length !== 0)) {
+
+                                    console.log(element);
+
+                                    console.log(_this.multiple && Object.keys(payload.el.value).length !== 0);
+
+                                    // Set value
+                                    element.domProps['value'] = _this.multiple ?
+                                                                payload.el.value[vnode.data.directives[input].value] :
+                                                                payload.el.value;
                                 }
                             }
-                        }
 
-                        // Set Value
-                        if (input && payload.el.hasOwnProperty('value')) {
-                            vdata['attrs'] = {...vdata.attrs, value: payload.el.value};
-                        } else if (input && vdata['attrs'].hasOwnProperty('value')) {
-                            // Clear old value from clone
-                            let clone = {...vdata.attrs};
-                            delete clone.value;
-                            vdata['attrs'] = {...clone};
-                        }
+                        vnode.data = {...vnode.data, ...element};
                     }
-
-                    vnode.data = vdata;
 
                     const clonedChildren = vnode.children && vnode.children.map(vnode => cloneVNode(vnode));
                     const cloned = createElement(vnode.tag, vnode.data, clonedChildren);
@@ -147,7 +127,7 @@ export const createCloneYa = (opts = {}) => {
             add(){
                 if (this.renderData.length === this.maximum) return;
 
-                this.renderData.push({_hash: uniqId()});
+                this.pushEmptyElement();
                 this.emitData();
             },
             del(event) {
@@ -162,7 +142,22 @@ export const createCloneYa = (opts = {}) => {
                 this.emitData();
 
             },
-            updateData(index, value) {
+            pushEmptyElement() {
+                // Pushes element with empty value and hash
+                let temp = {_hash: uniqId()};
+
+                if (this.multiple) temp['value'] = {};
+
+                this.renderData.push(temp);
+            },
+            updateData(index, value, key) {
+                if (this.multiple && key) {
+                    this.$set(this.renderData[index].value, key, value);
+                    this.emitData();
+
+                    return;
+                }
+
                 this.$set(this.renderData[index], 'value', value);
                 this.emitData();
             },
@@ -177,7 +172,7 @@ export const createCloneYa = (opts = {}) => {
                 let len = this.minimum - this.renderData.length;
 
                 for (let i = 0; i < len; i++) {
-                    this.renderData.push({_hash: uniqId()});
+                    this.pushEmptyElement();
                 }
             },
             fillWithValues() {
@@ -213,17 +208,7 @@ export const install = (Vue, opts) => {
     const Component = createCloneYa(opts);
     Vue.component(Component.name, Component);
 
-    Vue.directive('cloneyaInput', function (el) {
-        el.classList.add('vcloneya');
-    });
-
-    Vue.directive('cloneyaAdd', function (el) {
-        el.classList.add('vcloneya-add');
-    });
-
-    Vue.directive('cloneyaRemove', function (el) {
-        el.classList.add('vcloneya-remove');
-    });
+    installDirectives();
 };
 
 export default install;
