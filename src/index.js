@@ -203,7 +203,7 @@ export const install = (Vue, opts) => {
     const Component = createCloneYa(opts);
     Vue.component(Component.name, Component);
 
-    installDirectives();
+    installDirectives(Vue);
 };
 
 export default install;

@@ -11,7 +11,7 @@ const directives = {
 };
 
 
-export const installDirectives = () => {
+export const installDirectives = (Vue) => {
     for (let name in directives) Vue.directive(name, directives[name]);
 };
 
