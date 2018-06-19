@@ -69,11 +69,6 @@ export const createCloneYa = (opts = {}) => {
                                 };
 
                                 if (payload.el.hasOwnProperty('value') || (_this.multiple && Object.keys(payload.el.value).length !== 0)) {
-
-                                    console.log(element);
-
-                                    console.log(_this.multiple && Object.keys(payload.el.value).length !== 0);
-
                                     // Set value
                                     element.domProps['value'] = _this.multiple ?
                                                                 payload.el.value[vnode.data.directives[input].value] :
