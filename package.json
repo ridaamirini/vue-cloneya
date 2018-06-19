@@ -18,7 +18,9 @@
     "vue",
     "DOM",
     "elements",
-    "clone"
+    "clone",
+    "forms",
+    "inputs"
   ],
   "devDependencies": {
     "@vue/component-compiler-utils": "^1.2.1",
