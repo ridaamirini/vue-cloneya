@@ -8,7 +8,7 @@
         <div class="row" style="padding: 30px;">
             <div class="col-md-6 col-md-offset-4">
                 <div class="col-md-8">
-                    <vue-cloneya :minimum="1"
+                    <vue-cloneya :minimum="5"
                                  :multiple="true"
                                  v-model="exampleData"
                                  v-on:minimum:cloneya="alert('min')"
