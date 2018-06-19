@@ -49,6 +49,48 @@ Vue.use(VueCloneya)
   </div>
 </vue-cloneya>
 ```
+#### Output:
+```Javascript
+[
+  "Some value",
+  // ...
+]
+```
+
+#### With multiple elements:
+```vue
+<vue-cloneya :maximum="5" :value="exampleData">
+  <div class="input-group">
+      <!-- Add the "v-cloneya-input" directive to elements you wish to set v-bind:value -->
+      <!-- Only input, select, radio, checkbox etc. -->
+      <input type="text" class="form-control" placeholder="Firstname" v-cloneya-input="'Firstname'">
+      <input type="text" class="form-control" placeholder="Lastname" v-cloneya-input="'Lastname'">
+      <span class="input-group-btn">
+        <!-- Add the "v-cloneya-add" directive to elements you wish to add the click listener
+        that will clone the root element -->
+        <button type="button" class="btn btn-success" tabindex="-1" v-cloneya-add>
+            <i class="fa fa-plus"></i>
+        </button>
+        <!-- Add the "v-cloneya-remove" directive to elements you wish to add the click listener
+        that will remove the element -->
+        <button type="button" class="btn btn-danger" tabindex="-1"  v-cloneya-remove>
+          <i class="fa fa-minus"></i>
+        </button>
+      </span>
+  </div>
+</vue-cloneya>
+```
+#### Output:
+```Javascript
+[
+  { 
+    Firstname: "VALUE",
+    Lastname: "VALUE"
+   }
+   // ...
+]
+```
+
 ## API
 
 ### Props
@@ -72,7 +114,14 @@ The maximum number of clones allowed.
 - __Type__: `array`
 - __Default__: `null`
 
-The values for the v-cloneya-input. 
+The values for the v-cloneya-input. For Two-way Data Binding use `v-model`
+
+#### multiple
+
+- __Type__: `boolean`
+- __Default__: `false`
+
+Enables multiple `v-model` on multiple `v-cloneya-input` elements. `Sinice 1.0.6`
 
 ### Events
 
@@ -86,6 +135,10 @@ When maximum limit is reached:
 
 #### cloneyaInput
 v-cloneya-input
+
+- __Type__: `string` _optional_
+
+If `:multiple="true"` is enabled, you must supply the key where you wanted to retrieve the data on `v-model`
 
 #### cloneyaAdd
 v-cloneya-add
