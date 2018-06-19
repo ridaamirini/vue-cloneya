@@ -129,7 +129,11 @@ export const createCloneYa = (opts = {}) => {
                 let index = event.currentTarget.attributes.index.value;
 
                 if (this.renderData.length === this.minimum) {
-                    this.$set(this.renderData, index, {_hash: uniqId()});
+                    let temp = {_hash: uniqId()};
+
+                    if (this.multiple) temp['value'] = {};
+
+                    this.$set(this.renderData, index, temp);
                     return this.emitData();
                 }
 
