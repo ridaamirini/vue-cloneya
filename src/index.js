@@ -175,6 +175,9 @@ export const createCloneYa = (opts = {}) => {
                 }
             },
             fillWithValues() {
+                // When no values or wrong value is given stop here
+                if (!this.value || !Array.isArray(this.value)) return;
+
                 this.value.map(item => {
                     return this.renderData.push({_hash: uniqId(), value: item});
                 });
