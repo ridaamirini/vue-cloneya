@@ -64,6 +64,11 @@ export const createCloneYa = (opts = {}) => {
 
                             // On input value
                             if (input !== -1) {
+                                // Add name on input with index
+                                if (_this.multiple) {
+                                    element.domProps['name'] = vnode.data.attrs.name.replace('[]', `[${payload.index}]`)
+                                }
+
                                 element.on['input'] = function (event) {
                                     _this.updateData(payload.index, event.target.value, vnode.data.directives[input].value);
                                 };
